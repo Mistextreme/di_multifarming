@@ -1,0 +1,204 @@
+
+["strawberry"] = {
+    name = "strawberry",
+    label = "Strawberry",
+    weight = 50,
+    type = "item",
+    image = "strawberry.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A fresh, sweet strawberry."
+},
+
+["blueberry"] = {
+    name = "blueberry",
+    label = "Blueberry",
+    weight = 50,
+    type = "item",
+    image = "blueberry.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A small berry packed with flavor."
+},
+
+["orange"] = {
+    name = "orange",
+    label = "Orange",
+    weight = 80,
+    type = "item",
+    image = "orange.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A juicy and refreshing citrus fruit."
+},
+
+["pumpkin"] = {
+    name = "pumpkin",
+    label = "Pumpkin",
+    weight = 50,
+    type = "item",
+    image = "pumpkin.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A ripe pumpkin ready for cooking or carving."
+},
+
+["lemon"] = {
+    name = "lemon",
+    label = "Lemon",
+    weight = 50,
+    type = "item",
+    image = "lemon.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A sour citrus fruit often used in drinks."
+},
+
+["apple"] = {
+    name = "apple",
+    label = "Apple",
+    weight = 50,
+    type = "item",
+    image = "apple.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A crisp and sweet apple."
+},
+
+["tomato"] = {
+    name = "tomato",
+    label = "Tomato",
+    weight = 50,
+    type = "item",
+    image = "tomato.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A fresh tomato used in many dishes."
+},
+
+["grapes"] = {
+    name = "grapes",
+    label = "Grapes",
+    weight = 50,
+    type = "item",
+    image = "grapes.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A bundle of juicy grapes."
+},
+
+["strawberrybox"] = {
+    name = "strawberrybox",
+    label = "Strawberry Box",
+    weight = 50,
+    type = "item",
+    image = "strawberrybox.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A box filled with handpicked strawberries."
+},
+
+["blueberrybox"] = {
+    name = "blueberrybox",
+    label = "Blueberry Box",
+    weight = 50,
+    type = "item",
+    image = "blueberrybox.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A box full of fresh blueberries."
+},
+
+["orangejuice"] = {
+    name = "orangejuice",
+    label = "Orange Juice",
+    weight = 50,
+    type = "item",
+    image = "orangejuice.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A bottle of freshly squeezed orange juice."
+},
+
+["lemonjuice"] = {
+    name = "lemonjuice",
+    label = "Lemon Juice",
+    weight = 50,
+    type = "item",
+    image = "lemonjuice.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A bottle of tangy lemon juice."
+},
+
+["tomatoketchup"] = {
+    name = "tomatoketchup",
+    label = "Tomato Ketchup",
+    weight = 50,
+    type = "item",
+    image = "tomatoketchup.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A bottle of rich tomato ketchup."
+},
+
+["pumpkinpie"] = {
+    name = "pumpkinpie",
+    label = "Pumpkin Pie",
+    weight = 50,
+    type = "item",
+    image = "pumpkinpie.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A sweet pie made from fresh pumpkin."
+},
+
+["grapewine"] = {
+    name = "grapewine",
+    label = "Grape Wine",
+    weight = 50,
+    type = "item",
+    image = "grapewine.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A bottle of fine wine made from fresh grapes."
+},
+
+["applejuice"] = {
+    name = "applejuice",
+    label = "Apple Juice",
+    weight = 50,
+    type = "item",
+    image = "applejuice.png",
+    unique = false,
+    useable = false,
+    shouldClose = true,
+    description = "A bottle of sweet apple juice."
+},
+
+["fruitpicker"] = {
+    name = "fruitpicker",
+    label = "Fruit Picker",
+    weight = 50,
+    type = "item",
+    image = "fruitpicker.png",
+    unique = true,
+    useable = false,
+    shouldClose = true,
+    description = "A tool used to harvest fruits with ease."
+},
