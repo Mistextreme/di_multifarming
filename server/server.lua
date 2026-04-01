@@ -2,7 +2,6 @@
 -- di_multifarming | server/server.lua
 -- Framework : ESX-Legacy
 -- Inventory : ox_inventory (server exports)
--- DB        : oxmysql (not used directly; ESX handles accounts)
 -- ============================================================
 
 ESX = exports['es_extended']:getSharedObject()
@@ -53,9 +52,9 @@ local function getProcessEntry(cropType)
     return nil
 end
 
----Find a shop item's price (and config row) by item name.
+---Find a shop item's price by item name.
 ---@param itemName string
----@return number|nil price, string|nil payoutType
+---@return number|nil
 local function getShopItem(itemName)
     for _, loc in ipairs(Config.Shop.Locations) do
         for _, item in ipairs(loc.items) do
@@ -113,18 +112,6 @@ local function addItem(source, itemName, count)
     return exports.ox_inventory:AddItem(source, itemName, count)
 end
 
----Give money to a player using the correct ESX-Legacy account.
----@param xPlayer table  ESX player object
----@param amount number
----@param payoutType string  'cash' | 'bank'
-local function giveMoney(xPlayer, amount, payoutType)
-    if payoutType == 'bank' then
-        xPlayer.addAccountMoney('bank', amount)
-    else
-        xPlayer.addMoney(amount)
-    end
-end
-
 -- ============================================================
 -- CALLBACK: PICK CROP
 -- ============================================================
@@ -179,9 +166,9 @@ ESX.RegisterServerCallback('di_multifarming:pickCrop', function(source, cb, crop
         string.format('**%s** harvested **%dx %s**', playerName, amount, crop.item),
         5763719,
         {
-            { name = 'Player',   value = playerName,       inline = true },
-            { name = 'Crop',     value = cropName,          inline = true },
-            { name = 'Amount',   value = tostring(amount),  inline = true },
+            { name = 'Player',   value = playerName,        inline = true },
+            { name = 'Crop',     value = cropName,           inline = true },
+            { name = 'Amount',   value = tostring(amount),   inline = true },
             { name = 'Location', value = tostring(locIndex), inline = true }
         }
     )
@@ -245,9 +232,9 @@ ESX.RegisterServerCallback('di_multifarming:processCrop', function(source, cb, c
         ),
         15844367,
         {
-            { name = 'Player', value = playerName,                               inline = true },
-            { name = 'Input',  value = entry.required .. 'x ' .. entry.input,   inline = true },
-            { name = 'Output', value = entry.reward   .. 'x ' .. entry.output,  inline = true }
+            { name = 'Player', value = playerName,                              inline = true },
+            { name = 'Input',  value = entry.required .. 'x ' .. entry.input,  inline = true },
+            { name = 'Output', value = entry.reward   .. 'x ' .. entry.output, inline = true }
         }
     )
 
@@ -301,9 +288,9 @@ ESX.RegisterServerCallback('di_multifarming:buyItem', function(source, cb, itemN
         string.format('**%s** bought **1x %s** for **$%d**', playerName, itemName, price),
         3447003,
         {
-            { name = 'Player', value = playerName,      inline = true },
-            { name = 'Item',   value = itemName,        inline = true },
-            { name = 'Price',  value = '$' .. price,    inline = true }
+            { name = 'Player', value = playerName,   inline = true },
+            { name = 'Item',   value = itemName,     inline = true },
+            { name = 'Price',  value = '$' .. price, inline = true }
         }
     )
 
@@ -339,18 +326,18 @@ ESX.RegisterServerCallback('di_multifarming:sellItems', function(source, cb, ite
     local logLines    = {}
 
     for _, entry in ipairs(itemsToSell) do
-        local itemName      = entry.name
-        local requestedQty  = tonumber(entry.count) or 0
+        local itemName     = entry.name
+        local requestedQty = tonumber(entry.count) or 0
 
         if requestedQty <= 0 then goto continue end
 
-        -- Server-side price lookup (client cannot tamper)
+        -- Server-side price lookup (client cannot tamper with pricing)
         local price, payoutType = getSellItem(itemName)
         if not price then goto continue end
 
-        -- Clamp to actual inventory
-        local actualQty   = getItemCount(source, itemName)
-        local qtyToSell   = math.min(requestedQty, actualQty)
+        -- Clamp to actual inventory to prevent oversell exploits
+        local actualQty  = getItemCount(source, itemName)
+        local qtyToSell  = math.min(requestedQty, actualQty)
         if qtyToSell <= 0 then goto continue end
 
         -- Remove items from inventory
@@ -358,8 +345,8 @@ ESX.RegisterServerCallback('di_multifarming:sellItems', function(source, cb, ite
         if not removed then goto continue end
 
         -- Accumulate earnings by payout type
-        local earned = qtyToSell * price
-        totalEarned  = totalEarned + earned
+        local earned  = qtyToSell * price
+        totalEarned   = totalEarned + earned
         if payoutType == 'bank' then
             bankEarned = bankEarned + earned
         else
@@ -376,7 +363,7 @@ ESX.RegisterServerCallback('di_multifarming:sellItems', function(source, cb, ite
         return
     end
 
-    -- Pay the player
+    -- Pay the player per account type
     if cashEarned > 0 then xPlayer.addMoney(cashEarned) end
     if bankEarned > 0 then xPlayer.addAccountMoney('bank', bankEarned) end
 
@@ -391,8 +378,8 @@ ESX.RegisterServerCallback('di_multifarming:sellItems', function(source, cb, ite
         ),
         5763719,
         {
-            { name = 'Player',        value = playerName,          inline = true },
-            { name = 'Total Earned',  value = '$' .. totalEarned,  inline = true }
+            { name = 'Player',       value = playerName,         inline = true },
+            { name = 'Total Earned', value = '$' .. totalEarned, inline = true }
         }
     )
 
