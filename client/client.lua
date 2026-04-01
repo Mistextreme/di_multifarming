@@ -13,11 +13,12 @@ local ESX = exports['es_extended']:getSharedObject()
 -- STATE TABLES
 -- ============================================================
 
-local spawnedProps    = {}  -- [key] = entityHandle
-local activeZones     = {}  -- [key] = ox_target zone id
-local pickedLocations = {}  -- [key] = true  (on cooldown, no interaction)
-local spawnedPeds     = {}  -- list of ped entityHandles for cleanup
-local processProps    = {}  -- list of process-area prop entityHandles
+local spawnedProps      = {}  -- [key] = entityHandle
+local activeZones       = {}  -- [key] = ox_target zone id
+local pickedLocations   = {}  -- [key] = true  (on respawn cooldown, no interaction)
+local pickingInProgress = {}  -- [key] = true  (currently picking, blocks double-trigger)
+local spawnedPeds       = {}  -- list of ped entityHandles for cleanup
+local processProps      = {}  -- list of process-area prop entityHandles
 
 -- ============================================================
 -- EMOTE HELPERS
@@ -29,7 +30,7 @@ local function playEmote(emoteName)
 end
 
 local function stopEmote()
-    -- 'c' is the rpemotes cancel command
+    -- 'c' is the rpemotes cancel shortcut
     TriggerEvent('rpemotes:client:EmoteCommandFunc', 'c')
 end
 
@@ -111,12 +112,11 @@ end
 -- PED SPAWNING
 -- ============================================================
 
----Create a scenario ped at the given vector4 coords.
+---Create a frozen scenario ped at the given vector4 coords.
 ---@param model string  ped model name
 ---@param coords vector4
----@param emote string|nil  rpemotes emote to play on the ped (cosmetic only)
 ---@return number  ped entity handle
-local function spawnScenarioPed(model, coords, emote)
+local function spawnScenarioPed(model, coords)
     lib.requestModel(model)
     local hash = GetHashKey(model)
     local ped  = CreatePed(4, hash, coords.x, coords.y, coords.z - 1.0, coords.w, false, true)
@@ -125,7 +125,6 @@ local function spawnScenarioPed(model, coords, emote)
     FreezeEntityPosition(ped, true)
     SetPedCanRagdoll(ped, false)
     SetModelAsNoLongerNeeded(hash)
-    -- We don't trigger rpemotes on NPCs – they have their own scenario/anim
     return ped
 end
 
@@ -165,7 +164,8 @@ local function openProcessMenu()
     local menuOptions = {}
 
     for _, entry in ipairs(Config.process.crops) do
-        local haveCount  = exports.ox_inventory:Search('count', entry.input)
+        -- or 0: ox_inventory:Search returns 0 for items not found, but guard against edge-case nil
+        local haveCount  = exports.ox_inventory:Search('count', entry.input) or 0
         local canProcess = haveCount >= entry.required
 
         menuOptions[#menuOptions + 1] = {
@@ -281,7 +281,7 @@ local function registerShopPeds()
             EndTextCommandSetBlipName(blip)
         end
 
-        local ped = spawnScenarioPed(shopData.pedModel, coords, Config.Shop.emote)
+        local ped = spawnScenarioPed(shopData.pedModel, coords)
         spawnedPeds[#spawnedPeds + 1] = ped
 
         local capturedShopData = shopData
@@ -315,14 +315,15 @@ end
 local function buildSellableItems(sellLocationData)
     local results = {}
     for _, item in ipairs(sellLocationData.items) do
-        local count = exports.ox_inventory:Search('count', item.name)
+        -- or 0: guards against edge-case nil return from ox_inventory:Search
+        local count = exports.ox_inventory:Search('count', item.name) or 0
         if count > 0 then
             results[#results + 1] = {
-                name    = item.name,
-                label   = item.label,
-                count   = count,
-                price   = item.price,
-                payout  = item.payout and item.payout.type or 'cash',
+                name   = item.name,
+                label  = item.label,
+                count  = count,
+                price  = item.price,
+                payout = item.payout and item.payout.type or 'cash',
             }
         end
     end
@@ -347,7 +348,7 @@ local function openSellMenu(sellLocationData)
 
     -- Sell All button (when SellAll = true)
     if Config.Sell.SellAll then
-        local totalEstimate = 0
+        local totalEstimate  = 0
         local sellAllPayload = {}
         for _, item in ipairs(playerItems) do
             totalEstimate = totalEstimate + (item.count * item.price)
@@ -430,7 +431,7 @@ local function registerSellPeds()
             EndTextCommandSetBlipName(blip)
         end
 
-        local ped = spawnScenarioPed(sellData.pedModel, coords, Config.Sell.emote)
+        local ped = spawnScenarioPed(sellData.pedModel, coords)
         spawnedPeds[#spawnedPeds + 1] = ped
 
         local capturedSellData = sellData
@@ -478,7 +479,7 @@ local function spawnCropProp(cropName, crop, locIndex, coords)
 end
 
 ---Register the ox_target sphere zone for one pick location.
----Also handles the full pick interaction flow via onSelect.
+---Handles the full pick interaction flow via onSelect.
 ---@param cropName string
 ---@param crop table  crop config table
 ---@param locIndex number
@@ -497,6 +498,12 @@ local function registerPickZone(cropName, crop, locIndex, coords)
                 label    = 'Pick ' .. cropName,
                 onSelect = function()
 
+                    -- 0. In-progress guard: prevents double-picking while awaiting the
+                    --    server callback. A second onSelect can fire if the player
+                    --    cancels the progress bar and immediately re-clicks before the
+                    --    pickedLocations flag is set. This lock closes that window.
+                    if pickingInProgress[key] then return end
+
                     -- 1. Security: distance sanity check
                     if not isNearLocation(coords, Config.Security.pickRadius + 2.0) then
                         lib.notify({ title = 'Farming', description = 'You are too far away.', type = 'error' })
@@ -509,8 +516,9 @@ local function registerPickZone(cropName, crop, locIndex, coords)
                         return
                     end
 
-                    -- 3. Client-side tool pre-check (server re-validates)
-                    local toolCount = exports.ox_inventory:Search('count', crop.requiredItem)
+                    -- 3. Client-side tool pre-check (server re-validates authoritatively)
+                    -- or 0: guards against edge-case nil return from ox_inventory:Search
+                    local toolCount = exports.ox_inventory:Search('count', crop.requiredItem) or 0
                     if toolCount < 1 then
                         lib.notify({
                             title       = 'Farming',
@@ -519,6 +527,9 @@ local function registerPickZone(cropName, crop, locIndex, coords)
                         })
                         return
                     end
+
+                    -- Acquire the in-progress lock before any async operation
+                    pickingInProgress[key] = true
 
                     -- 4. Emote + progress bar
                     playEmote(crop.emote)
@@ -534,12 +545,15 @@ local function registerPickZone(cropName, crop, locIndex, coords)
                     stopEmote()
 
                     if not success then
+                        pickingInProgress[key] = nil  -- Release lock on cancel
                         lib.notify({ title = 'Farming', description = 'Picking cancelled.', type = 'error' })
                         return
                     end
 
                     -- 5. Server callback (authoritative validation + reward)
                     ESX.TriggerServerCallback('di_multifarming:pickCrop', function(ok, msg)
+                        pickingInProgress[key] = nil  -- Always release lock on callback return
+
                         if not ok then
                             lib.notify({ title = 'Farming', description = msg, type = 'error' })
                             return
@@ -597,7 +611,7 @@ end
 AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then return end
 
-    -- Remove all ox_target zones
+    -- Remove all tracked ox_target sphere zones
     for _, zoneId in pairs(activeZones) do
         exports.ox_target:removeZone(zoneId)
     end
@@ -626,6 +640,10 @@ AddEventHandler('onResourceStop', function(resourceName)
         end
     end
     spawnedPeds = {}
+
+    -- Clear runtime state tables
+    pickedLocations   = {}
+    pickingInProgress = {}
 end)
 
 -- ============================================================
