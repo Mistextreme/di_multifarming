@@ -1,0 +1,154 @@
+
+	["strawberry"] = {
+		label = "Strawberry",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A fresh, sweet strawberry.",
+		client = { image = "strawberry.png" }
+	},
+
+	["blueberry"] = {
+		label = "Blueberry",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A small berry packed with flavor.",
+		client = { image = "blueberry.png" }
+	},
+
+	["orange"] = {
+		label = "Orange",
+		weight = 80,
+		stack = true,
+		close = true,
+		description = "A juicy and refreshing citrus fruit.",
+		client = { image = "orange.png" }
+	},
+
+	["pumpkin"] = {
+		label = "Pumpkin",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A ripe pumpkin ready for cooking or carving.",
+		client = { image = "pumpkin.png" }
+	},
+
+	["lemon"] = {
+		label = "Lemon",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A sour citrus fruit often used in drinks.",
+		client = { image = "lemon.png" }
+	},
+
+	["apple"] = {
+		label = "Apple",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A crisp and sweet apple.",
+		client = { image = "apple.png" }
+	},
+
+	["tomato"] = {
+		label = "Tomato",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A fresh tomato used in many dishes.",
+		client = { image = "tomato.png" }
+	},
+
+	["grapes"] = {
+		label = "Grapes",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A bundle of juicy grapes.",
+		client = { image = "grapes.png" }
+	},
+
+	["strawberrybox"] = {
+		label = "Strawberry Box",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A box filled with handpicked strawberries.",
+		client = { image = "strawberrybox.png" }
+	},
+
+	["blueberrybox"] = {
+		label = "Blueberry Box",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A box full of fresh blueberries.",
+		client = { image = "blueberrybox.png" }
+	},
+
+	["orangejuice"] = {
+		label = "Orange Juice",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A bottle of freshly squeezed orange juice.",
+		client = { image = "orangejuice.png" }
+	},
+
+	["lemonjuice"] = {
+		label = "Lemon Juice",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A bottle of tangy lemon juice.",
+		client = { image = "lemonjuice.png" }
+	},
+
+	["tomatoketchup"] = {
+		label = "Tomato Ketchup",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A bottle of rich tomato ketchup.",
+		client = { image = "tomatoketchup.png" }
+	},
+
+	["pumpkinpie"] = {
+		label = "Pumpkin Pie",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A sweet pie made from fresh pumpkin.",
+		client = { image = "pumpkinpie.png" }
+	},
+
+	["grapewine"] = {
+		label = "Grape Wine",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A bottle of fine wine made from fresh grapes.",
+		client = { image = "grapewine.png" }
+	},
+
+	["applejuice"] = {
+		label = "Apple Juice",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A bottle of sweet apple juice.",
+		client = { image = "applejuice.png" }
+	},
+
+	["fruitpicker"] = {
+		label = "Fruit Picker",
+		weight = 50,
+		stack = true,
+		close = true,
+		description = "A tool used to harvest fruits with ease.",
+		client = { image = "fruitpicker.png" }
+	},
+    
