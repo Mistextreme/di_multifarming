@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'DOTINIT SCRIPTS'
-description 'Multifarming Script for QBcore/QBox'
+description 'Multifarming Script for ESX-Legacy | ox_target | ox_inventory'
 version '1.1.0'
 
 lua54 'yes'
@@ -27,16 +27,15 @@ client_scripts {
 }
 
 server_scripts {
-    '@oxmysql/lib/MySQL.lua',
     'server/server.lua',
     'server/webhook.lua',
 }
 
 escrow_ignore {
     'config/*.lua',
-    'server/webhook.lua',   
-
+    'server/webhook.lua',
 }
 
 dependency 'ox_lib'
+dependency 'es_extended'
 dependency '/assetpacks'
